@@ -1,0 +1,195 @@
+﻿==================================================
+  PHASE 1: THE QUERY OPTIMIZER
+==================================================
+[Loader] Loaded 10,000 records.
+
+==================================================
+  SORT BENCHMARK  |  key: 'Total Revenue'  |  n=10,000
+==================================================
+  Bubble Sort     → 5.9377s
+  Insertion Sort  → 2.4919s
+  Selection Sort  → 3.1285s
+  Merge Sort      → 0.0207s
+  Quick Sort      → 0.0241s
+  Timsort (built-in) → 0.0019s
+==================================================
+
+==================================================
+  SEARCH BENCHMARK  |  Target Order ID: 773452794
+==================================================
+  Linear Search (unsorted) → 0.000010s | Found: True
+  Binary Search (sorted)   → 0.000010s | Found: True
+
+  Order ID : 773452794
+  Country  : Zambia
+  Revenue  : 148,926.80
+  Profit   : 64,139.16
+==================================================
+
+[Bisect] 7/1/2015 → 9/30/2015 | 348 transactions found.
+[Bisect] Total Q3 2015 Revenue: 455,808,486.12
+
+
+==================================================
+  PHASE 2: THE APPLIED STEPS TRACKER
+==================================================
+
+--- Part 1: Singly Linked List ---
+[Singly] Added step: 'Removed Nulls'
+[Singly] Added step: 'Changed Type: Order ID to Integer'
+[Singly] Added step: 'Renamed Column: 'Total Revenue' to 'Revenue''
+[Singly] Added step: 'Filtered: Sales Channel = Online'
+
+[Singly] Transformation History:
+  1. Removed Nulls
+  2. Changed Type: Order ID to Integer
+  3. Renamed Column: 'Total Revenue' to 'Revenue'
+  4. Filtered: Sales Channel = Online
+[Singly] Removed step: 'Filtered: Sales Channel = Online'
+
+[Singly] Transformation History:
+  1. Removed Nulls
+  2. Changed Type: Order ID to Integer
+  3. Renamed Column: 'Total Revenue' to 'Revenue'
+
+--- Part 2: Doubly Linked List (Undo/Redo Engine) ---
+[Tracker] Applied step: 'Removed Nulls'
+[Tracker] Applied step: 'Changed Type: Order ID to Integer'
+[Tracker] Applied step: 'Renamed Column: 'Total Revenue' to 'Revenue''
+[Tracker] Applied step: 'Filtered: Region = Sub-Saharan Africa'
+
+[Tracker] Full Step History (head → tail):
+  1. Removed Nulls
+  2. Changed Type: Order ID to Integer
+  3. Renamed Column: 'Total Revenue' to 'Revenue'
+  4. Filtered: Region = Sub-Saharan Africa ← current
+
+[Tracker] Undo → removed 'Filtered: Region = Sub-Saharan Africa'
+[Tracker] Undo → removed 'Renamed Column: 'Total Revenue' to 'Revenue''
+
+[Tracker] Full Step History (head → tail):
+  1. Removed Nulls
+  2. Changed Type: Order ID to Integer ← current
+  3. Renamed Column: 'Total Revenue' to 'Revenue'
+  4. Filtered: Region = Sub-Saharan Africa
+
+[Tracker] Redo → restored 'Renamed Column: 'Total Revenue' to 'Revenue''
+
+[Tracker] Full Step History (head → tail):
+  1. Removed Nulls
+  2. Changed Type: Order ID to Integer
+  3. Renamed Column: 'Total Revenue' to 'Revenue' ← current
+  4. Filtered: Region = Sub-Saharan Africa
+
+[Tracker] Applied step: 'Sorted by Total Profit Descending'
+
+[Tracker] Full Step History (head → tail):
+  1. Removed Nulls
+  2. Changed Type: Order ID to Integer
+  3. Renamed Column: 'Total Revenue' to 'Revenue'
+  4. Sorted by Total Profit Descending ← current
+
+
+[Tracker] Reverse History (tail → head):
+  5. Sorted by Total Profit Descending
+  4. Renamed Column: 'Total Revenue' to 'Revenue'
+  3. Changed Type: Order ID to Integer
+  2. Removed Nulls
+
+  ==================================================
+  PHASE 3: THE DAX FORMULA PARSER
+==================================================
+
+--- Postfix Expression Evaluator ---
+  Postfix : 15000 5000 + 2 *
+  Meaning : (15000 + 5000) * 2
+  Result  : 40,000.00
+
+  Postfix : 850000 340000 - 0.15 *
+  Meaning : (Revenue - Cost) * Tax 15%
+  Result  : 76,500.00
+
+  Postfix : 9 3 / 4 2 - *
+  Meaning : (9 / 3) * (4 - 2)
+  Result  : 6.00
+
+--- Parentheses Validator ---
+  ✓ Valid → CALCULATE(SUM([Revenue]), FILTER([Region], [Region] = "Africa"))
+  ✓ Valid → IF(([Revenue] - [Cost]) > 0, "Profit", "Loss")
+  ✗ Invalid → SUMX(Sales, [Units Sold] * [Unit Price]
+  ✗ Invalid → DIVIDE([Revenue], [Cost])) * 100
+
+--- Infix to Postfix Converter (Shunting-Yard) ---
+  Infix   : ( 15000 + 5000 ) * 2
+  Postfix : 15000 5000 + 2 *
+  Result  : 40,000.00
+
+  Infix   : 850000 - 340000 * 0.15
+  Postfix : 850000 340000 0.15 * -
+  Result  : 799,000.00
+
+  Infix   : ( 9 / 3 ) * ( 4 - 2 )
+  Postfix : 9 3 / 4 2 - *
+  Result  : 6.
+  ==================================================
+  PHASE 4: THE LIVE DATA BUFFER
+==================================================
+
+--- Live Ingestion Queue (White Friday Simulation) ---
+[Buffer] Enqueued: {'txn': 1045, 'branch': 'Maadi', 'amt_egp': 850}
+[Buffer] Enqueued: {'txn': 1046, 'branch': 'Smouha', 'amt_egp': 3200}
+[Buffer] Enqueued: {'txn': 1047, 'branch': 'Zayed', 'amt_egp': 1750}
+[Buffer] Enqueued: {'txn': 1048, 'branch': 'Mansoura', 'amt_egp': 620}
+[Buffer] Enqueued: {'txn': 1049, 'branch': 'Maadi', 'amt_egp': 4400}
+
+[Buffer] 5 transactions waiting in queue.
+[Buffer] Processed 3 transactions → pushing to Power BI...
+[Buffer] 2 transactions still in queue.
+[Buffer] Processed 2 transactions → pushing to Power BI...
+[Buffer] 0 transactions still in queue.
+
+--- Queue Performance Benchmark ---
+  ListQueue   (n=10,000) → 0.1104s  [O(n) dequeue]
+  LinkedQueue (n=10,000) → 0.0035s  [O(1) dequeue]
+  deque       (n=10,000) → 0.0005s  [O(1) dequeue]
+  ==================================================
+  PHASE 5: THE HIERARCHICAL MATRIX BUILDER
+==================================================
+
+--- Part 1: Binary Search Tree (Customer Dimension Index) ---
+[BST] Inserted → ID: 29051997  Name: Ahmed Hassan
+[BST] Inserted → ID: 15031985  Name: Sara Mohamed
+[BST] Inserted → ID: 22081990  Name: Khaled Ali
+[BST] Inserted → ID: 30121978  Name: Mona Samir
+[BST] Inserted → ID: 10042003  Name: Omar Tarek
+[BST] Inserted → ID: 5072000  Name: Nour Adel
+[BST] Inserted → ID: 18092010  Name: Youssef Karim
+
+[BST] Inorder traversal (sorted by National ID):
+  5072000  →  Nour Adel
+  10042003  →  Omar Tarek
+  15031985  →  Sara Mohamed
+  18092010  →  Youssef Karim
+  22081990  →  Khaled Ali
+  29051997  →  Ahmed Hassan
+  30121978  →  Mona Samir
+
+[BST] Searching for customers:
+  Found  → ID: 22081990  Name: Khaled Ali
+  Not found → ID: 99999999
+
+--- Part 2: N-ary Organizational Chart ---
+
+[Org Chart] NileMart Hierarchy:
+Omar (Global CEO)  (Direct Sales: 0 EGP)
+├── Tarek (VP Cairo & Giza)  (Direct Sales: 0 EGP)
+│   ├── Aya (Maadi Branch Rep)  (Direct Sales: 150,000 EGP)
+│   └── Mahmoud (Zayed Branch Rep)  (Direct Sales: 270,000 EGP)
+└── Salma (VP Alex & Delta)  (Direct Sales: 0 EGP)
+    ├── Kareem (Smouha Branch Rep)  (Direct Sales: 180,000 EGP)
+    └── Nour (Mansoura Branch Rep)  (Direct Sales: 120,000 EGP)
+
+[Roll-Up] Calculating total sales per region:
+  Tarek (VP Cairo & Giza)  → 420,000 EGP
+  Salma (VP Alex & Delta)  → 300,000 EGP
+  Omar  (Global CEO)       → 720,000 EGP  (entire company)
