@@ -20,16 +20,22 @@ in the backend before it ever reaches the visualization layer.
 ```
 dataflow_pro/
 ├── data/
-│   └── sales_data.csv        # 10,000 NileMart transaction records
+│   └── sales_data.csv          # 10,000 NileMart transaction records
+├── docs/
+│   └── PERFORMANCE_REPORT.md   # Answers all Big-O questions from PDF
+├── tests/
+│   └── test_all_phases.py      # Validates all code works
 ├── src/
-│   ├── phase1_indexer.py     # Sorting & Searching
-│   ├── phase2_tracker.py     # Linked Lists
-│   ├── phase3_parser.py      # Stacks
-│   ├── phase4_buffer.py      # Queues
-│   ├── phase5_trees.py       # Trees & BST
-│   └── main.py               # CLI entry point
+│   ├── phase1_indexer.py       # Sorting & Searching
+│   ├── phase2_tracker.py       # Linked Lists
+│   ├── phase3_parser.py        # Stacks
+│   ├── phase4_buffer.py        # Queues
+│   ├── phase5_trees.py         # Trees & BST
+│   └── main.py                 # CLI entry point
 ├── requirements.txt
-└── README.md
+└── logs.txt
+├── README.md
+└── validate_submissions.py
 ```
 
 ---
